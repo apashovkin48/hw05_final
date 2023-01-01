@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Технологии{% endblock %}
+{% block content %}
+{% load thumbnail %}
+
+<div class="row mb-2">
+  <div class="col-md-3">
+    <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item">
+          Python
+        </li>
+        <li class="list-group-item">
+          Django
+        </li>
+        <li class="list-group-item">
+          JavaScript
+        </li>
+        <li class="list-group-item">
+          Bootstrap
+        </li>
+        <li class="list-group-item">
+          CSS Style
+        </li>
+        <li class="list-group-item">
+          HTML
+        </li>
+      </ul>
+    </div>
+  </div>
+  <div class="col-md-9">
+    <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">
+      <div class="col p-4 d-flex flex-column position-static">
+        <p>Backend приложения разработывался на Django. В нем содержится вся мощь и магия. Он способен на молекулярном уровне принимать и отдавать данные из БД, т.к. тут используются САМЫЕ эффективные запросы к данным.</p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} 
