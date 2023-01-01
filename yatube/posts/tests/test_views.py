@@ -5,7 +5,7 @@ from django.urls import reverse
 from django.core.cache import cache
 from django import forms
 
-from ..models import Post, Group, Following
+from ..models import Post, Group, Follow
 
 User = get_user_model()
 
@@ -69,7 +69,7 @@ class PostsPagesTests(TestCase):
     def test_follow_template(self):
         response = self.reader_client.get(reverse('posts:follow_index'))
         self.assertEqual(len(response.context['page_obj']), 0)
-        Following.objects.create(
+        Follow.objects.create(
             user=PostsPagesTests.reader,
             author=PostsPagesTests.user
         )

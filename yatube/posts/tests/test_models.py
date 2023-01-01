@@ -1,7 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 
-from ..models import Group, Post, Following
+from ..models import Group, Post, Follow
 
 User = get_user_model()
 
@@ -21,7 +21,7 @@ class PostModelTest(TestCase):
             author=cls.user,
             text='Тестовый пост',
         )
-        cls.following = Following.objects.create(
+        cls.following = Follow.objects.create(
             user=cls.reader,
             author=cls.user
         )

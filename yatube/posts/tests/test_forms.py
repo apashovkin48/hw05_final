@@ -1,7 +1,7 @@
 import shutil
 import tempfile
 
-from ..models import Group, Post, Comment, Following
+from ..models import Group, Post, Comment, Follow
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.test import Client, TestCase, override_settings
@@ -228,7 +228,7 @@ class PostsCreateFormTests(TestCase):
         )
 
     def test_subscribe_and_unsubscribe_author(self):
-        cnt_following = Following.objects.count()
+        cnt_following = Follow.objects.count()
         response = self.reader_client.post(
             reverse(
                 'posts:profile_follow',
@@ -243,7 +243,7 @@ class PostsCreateFormTests(TestCase):
                 kwargs={'username': PostsCreateFormTests.user}
             )
         )
-        self.assertEqual(Following.objects.count(), cnt_following + 1)
+        self.assertEqual(Follow.objects.count(), cnt_following + 1)
 
         response = self.reader_client.post(
             reverse(
@@ -259,4 +259,4 @@ class PostsCreateFormTests(TestCase):
                 kwargs={'username': PostsCreateFormTests.user}
             )
         )
-        self.assertEqual(Following.objects.count(), cnt_following)
+        self.assertEqual(Follow.objects.count(), cnt_following)

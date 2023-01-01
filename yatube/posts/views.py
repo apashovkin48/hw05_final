@@ -1,6 +1,6 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Post, Group, User, Following
+from .models import Post, Group, User, Follow
 from .forms import PostForm, CommentForm
 from .utils import get_page_obj
 from django.views.decorators.cache import cache_page
@@ -20,7 +20,7 @@ def belong_post_author(func):
 def is_can_add_subscribe(user, author_name):
     author = get_object_or_404(User, username=author_name)
     if (
-        not Following.objects.filter(
+        not Follow.objects.filter(
             user=user,
             author=author
         ).exists()
@@ -34,7 +34,7 @@ def is_can_add_subscribe(user, author_name):
 def is_can_del_subscribe(user, author_name):
     author = get_object_or_404(User, username=author_name)
     if (
-        Following.objects.filter(
+        Follow.objects.filter(
             user=user,
             author=author
         ).exists()
@@ -161,7 +161,7 @@ def follow_index(request):
 @login_required
 def profile_follow(request, username):
     if (is_can_add_subscribe(request.user, username)):
-        following = Following(
+        following = Follow(
             user=request.user,
             author=get_object_or_404(User, username=username)
         )
@@ -172,7 +172,7 @@ def profile_follow(request, username):
 @login_required
 def profile_unfollow(request, username):
     if (is_can_del_subscribe(request.user, username)):
-        Following.objects.filter(
+        Follow.objects.filter(
             user=request.user,
             author=get_object_or_404(User, username=username)
         ).delete()

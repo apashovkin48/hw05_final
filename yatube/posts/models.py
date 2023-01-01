@@ -93,7 +93,7 @@ class Comment(BaseModel):
         return self.text[:15]
 
 
-class Following(models.Model):
+class Follow(models.Model):
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
