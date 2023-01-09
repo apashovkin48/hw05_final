@@ -52,7 +52,8 @@ class Post(BaseModel):
     image = models.ImageField(
         'Картинка',
         upload_to='posts/',
-        blank=True
+        blank=True,
+        null=True
     )
 
     class Meta:
@@ -108,6 +109,14 @@ class Follow(models.Model):
         verbose_name='Автор',
         help_text='Автор на которого ты хочешь подписаться'
     )
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['user', 'author'],
+                name='unique subscribe'
+            )
+        ]
 
     def __str__(self):
         return f"{self.user.username} - {self.author.username}"

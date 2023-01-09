@@ -50,14 +50,17 @@ class PostsCreateFormTests(TestCase):
         self.reader_client = Client()
         self.reader_client.force_login(PostsCreateFormTests.reader)
 
-    def test_create_post(self):
-        """Создания Post через валидную форму"""
-        posts_count = Post.objects.count()
+    def test_guest_create_post(self):
+        uploaded = SimpleUploadedFile(
+            name='small.gif',
+            content=PostsCreateFormTests.small_gif,
+            content_type='image/gif'
+        )
         form_data = {
             'text': 'Тестовый пост',
-            'group': PostsCreateFormTests.group.pk
+            'group': PostsCreateFormTests.group.pk,
+            'image': uploaded
         }
-
         self.assertRedirects(
             self.guest_client.post(
                 reverse('posts:post_create'),
@@ -67,6 +70,13 @@ class PostsCreateFormTests(TestCase):
             '/auth/login/?next=/create/'
         )
 
+    def test_create_post(self):
+        """Создания Post через валидную форму"""
+        posts_count = Post.objects.count()
+        form_data = {
+            'text': 'Тестовый пост',
+            'group': PostsCreateFormTests.group.pk
+        }
         response = self.author_client.post(
             reverse('posts:post_create'),
             data=form_data,
@@ -76,7 +86,6 @@ class PostsCreateFormTests(TestCase):
             response,
             reverse('posts:profile', kwargs={'username': 'auth'})
         )
-
         self.assertEqual(Post.objects.count(), posts_count + 1)
         self.assertTrue(
             Post.objects.filter(
@@ -162,16 +171,8 @@ class PostsCreateFormTests(TestCase):
         form_data = {
             'text': 'Тестовый пост',
             'group': PostsCreateFormTests.group.pk,
-            'image': uploaded,
+            'image': uploaded
         }
-        self.assertRedirects(
-            self.guest_client.post(
-                reverse('posts:post_create'),
-                data=form_data,
-                follow=True
-            ),
-            '/auth/login/?next=/create/'
-        )
         response = self.author_client.post(
             reverse('posts:post_create'),
             data=form_data,

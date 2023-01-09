@@ -2,7 +2,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Post, Group, User, Follow
 from .forms import PostForm, CommentForm
-from .utils import get_page_obj
+from .utils import get_page_obj, is_can_add_subscribe, is_can_del_subscribe
 from django.views.decorators.cache import cache_page
 
 
@@ -15,34 +15,6 @@ def belong_post_author(func):
         else:
             return redirect('posts:post_detail', post_id)
     return wrapper
-
-
-def is_can_add_subscribe(user, author_name):
-    author = get_object_or_404(User, username=author_name)
-    if (
-        not Follow.objects.filter(
-            user=user,
-            author=author
-        ).exists()
-        and user.username != author.username
-    ):
-        return True
-    else:
-        return False
-
-
-def is_can_del_subscribe(user, author_name):
-    author = get_object_or_404(User, username=author_name)
-    if (
-        Follow.objects.filter(
-            user=user,
-            author=author
-        ).exists()
-        and user.username != author.username
-    ):
-        return True
-    else:
-        return False
 
 
 @cache_page(60 * 20, key_prefix='index_page')
@@ -75,8 +47,7 @@ def profile(request, username):
 
     context = {
         'page_obj': page_obj,
-        'author': author,
-        'num_posts_author': post_list.count(),
+        'author': author
     }
     if not request.user.is_anonymous:
         context['following'] = is_can_add_subscribe(request.user, username)
@@ -91,28 +62,27 @@ def post_detail(request, post_id):
     context = {
         'post': post,
         'form': form,
-        'comments': comments,
-        'num_posts_author': Post.objects.filter(author=post.author).count(),
+        'comments': comments
     }
     return render(request, 'posts/post_detail.html', context)
 
 
 @login_required
 def post_create(request):
-    form = PostForm()
+    form = PostForm(
+        request.POST or None,
+        files=request.FILES or None,
+    )
+
+    if form.is_valid():
+        post = form.save(commit=False)
+        post.author = request.user
+        post.save()
+        return redirect('posts:profile', request.user)
+
     context = {
         'form': form,
     }
-
-    if request.method == 'POST':
-        form = PostForm(request.POST)
-        if form.is_valid():
-            post = form.save(commit=False)
-            post.author = request.user
-            post.save()
-            return redirect('posts:profile', request.user)
-
-        context['form'] = form
     return render(request, 'posts/create_post.html', context)
 
 
@@ -161,11 +131,10 @@ def follow_index(request):
 @login_required
 def profile_follow(request, username):
     if (is_can_add_subscribe(request.user, username)):
-        following = Follow(
+        Follow.objects.create(
             user=request.user,
             author=get_object_or_404(User, username=username)
         )
-        following.save()
     return redirect('posts:profile', username)
 
 
