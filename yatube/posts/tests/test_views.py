@@ -6,6 +6,7 @@ from django.core.cache import cache
 from django import forms
 
 from ..models import Post, Group, Follow
+from itertools import islice
 
 User = get_user_model()
 
@@ -156,12 +157,15 @@ class PaginatorViewsTest(TestCase):
 
         cls.POSTS_NUM: int = 14
         cls.POSTS_PAGE_NUM: int = 10
-        for i in range(0, cls.POSTS_NUM):
-            Post.objects.create(
+        cls.objs = (
+            Post(
                 author=PaginatorViewsTest.user,
                 group=PaginatorViewsTest.group,
-                text=f'Пост{i+1}'
-            )
+                text='Пост%s' % (i + 1)
+            ) for i in range(cls.POSTS_NUM)
+        )
+        cls.batch = list(islice(cls.objs, cls.POSTS_NUM))
+        Post.objects.bulk_create(cls.batch, cls.POSTS_NUM)
 
         cls.paginator_info = {
             reverse(
